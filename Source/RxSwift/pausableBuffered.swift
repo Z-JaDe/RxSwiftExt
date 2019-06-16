@@ -50,7 +50,7 @@ extension ObservableType {
                 case .next(let resume):
                     paused = !resume
 
-                    if resume && buffer.count > 0 {
+                    if resume && buffer.isEmpty == false {
                         flush()
                     }
                 case .completed:
