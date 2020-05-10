@@ -72,6 +72,7 @@ These operators are much like the RxSwift & RxCocoa core operators, but provide 
 * [filterMap](#filtermap)
 * [Observable.fromAsync](#fromasync)
 * [Observable.zip(with:)](#zipwith)
+* [Observable.merge(with:)](#mergewith)
 * [withUnretained](#withunretained)
 * [count](#count)
 * [partition](#partition)
@@ -453,7 +454,7 @@ let resilientRequest = request.apply(requestPolicy)
 A common pattern in Rx is to filter out some values, then map the remaining ones to something else. `filterMap` allows you to do this in one step:
 
 ```swift
-// keep only odd numbers and double them
+// keep only even numbers and double them
 Observable.of(1,2,3,4,5,6)
 	.filterMap { number in
 		(number % 2 == 0) ? .ignore : .map(number * 2)
@@ -464,7 +465,7 @@ The sequence above keeps even numbers 2, 4, 6 and produces the sequence 4, 8, 12
 
 #### errors, elements
 
-These operators only apply to observable serquences that have been materialized with the `materialize()` operator (from RxSwift core). `errors` returns a sequence of filtered error events, ommitting elements. `elements` returns a sequence of filtered element events, ommitting errors.
+These operators only apply to observable sequences that have been materialized with the `materialize()` operator (from RxSwift core). `errors` returns a sequence of filtered error events, ommitting elements. `elements` returns a sequence of filtered element events, ommitting errors.
 
 ```swift
 let imageResult = _chooseImageButtonPressed.asObservable()
@@ -502,7 +503,7 @@ observableService("Foo", 0)
     .disposed(by: disposeBag)
 ```
 
-#### zipWith
+#### zip(with:)
 
 Convenience version of `Observable.zip(_:)`. Merges the specified observable sequences into one observable sequence by using the selector function whenever all
  of the observable sequences have produced an element at a corresponding index.
@@ -522,6 +523,25 @@ first.zip(with: second) { i, s in
 next("a1")
 next("b2")
 next("c3")
+```
+
+#### merge(with:)
+
+Convenience version of `Observable.merge(_:)`. Merges elements from the observable sequence with those of a different observable sequences into a single observable sequence.
+
+```swift
+let oddStream = Observable.of(1, 3, 5)
+let evenStream = Observable.of(2, 4, 6)
+let otherStream = Observable.of(1, 5, 6)
+
+oddStream.merge(with: evenStream, otherStream)
+    .subscribe(onNext: { result in
+        print(result)
+    })
+```
+
+```
+1 2 1 3 4 5 5 6 6
 ```
 
 #### ofType
